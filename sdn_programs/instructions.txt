@@ -1,0 +1,23 @@
+Чтобы запустить docker для симуляции SDN-сети, пройдите следующие шаги:
+
+1) Запустите 4 команды из файла commands.txt
+
+2) Скопируйте в docker-контейнер файл topo_for_lab.py
+
+3) Откройте в браузере вкладки 
+    - http://localhost:8181/onos/ui/#/topo2
+    - http://localhost:8181/onos/v1/docs/#/
+логин: onos
+пароль: rocks
+
+4) Войдите во вкладку Applications и подключите библиотеки:
+    - org.onosproject.openflow-base
+    - org.onosproject.lldpprovider
+    
+    Они понадобятся для соединения docker с ONOS-контроллером
+
+5) Запустите в docker команду
+sudo python topo_for_lab.py 'ip_adress' 6633
+
+6) Для конфигурации сети путём ''проталкивания''' правил перейдите на вкладку 
+http://localhost:8181/onos/v1/docs/#/
