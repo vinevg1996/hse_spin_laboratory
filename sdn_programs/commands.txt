@@ -1,0 +1,7 @@
+sudo docker pull onosproject/onos
+
+sudo docker run -d -p 8181:8181 -p 6633:6633 -p 6653:6653 onosproject/onos
+ 
+sudo docker pull containernet/containernet
+
+sudo docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock --privileged --pid='host' containernet/containernet /bin/bash
