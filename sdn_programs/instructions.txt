@@ -1,23 +1,37 @@
-Чтобы запустить docker для симуляции SDN-сети, пройдите следующие шаги:
+1) Команды, необходимые для работы с докером:
+просмотр всех запущенных докеров: sudo docker ps -a
+остановить 4 последних докера: sudo docker stop $(sudo docker ps -a -q -n 4)
+убить 4 последних докера: sudo docker rm $(sudo docker ps -a -q -n 4)
 
-1) Запустите 4 команды из файла commands.txt
+2) Установить модуль KVM:
+- yеобходим для загрузки библиотеки для работы с коммутатором в докере
+sudo apt-get install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils 
+sudo apt-get install openvswitch-switch
 
-2) Скопируйте в docker-контейнер файл topo_for_lab.py
+3) Откройте терминал и запустите следующие команды:
+sudo docker pull onosproject/onos
+sudo docker run -d -p 8181:8181 -p 6633:6633 -p 6653:6653 onosproject/onos
+sudo docker pull containernet/containernet
+sudo docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock --privileged --pid='host' containernet/containernet /bin/bash
 
-3) Откройте в браузере вкладки 
+4) Скопируйте в docker-контейнер файл topo_for_lab.py
+
+5) Откройте в браузере вкладки 
     - http://localhost:8181/onos/ui/#/topo2
     - http://localhost:8181/onos/v1/docs/#/
-логин: onos
+логин: onosыudo docker 
 пароль: rocks
 
-4) Войдите во вкладку Applications и подключите библиотеки:
+6) Войдите во вкладку Applications (слева вверху) и подключите библиотеки:
     - org.onosproject.openflow-base
     - org.onosproject.lldpprovider
     
     Они понадобятся для соединения docker с ONOS-контроллером
 
-5) Запустите в docker команду
+7) После выполнения шага 6 вернитесь на вкладку Topology и посмотрите ваш ip_address
+
+8) Запустите в docker команду
 sudo python topo_for_lab.py 'ip_adress' 6633
 
-6) Для конфигурации сети путём ''проталкивания''' правил перейдите на вкладку 
+9) Для конфигурации сети путём ''проталкивания''' правил перейдите на вкладку 
 http://localhost:8181/onos/v1/docs/#/
