@@ -15,11 +15,13 @@ sudo docker pull containernet/containernet
 sudo docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock --privileged --pid='host' containernet/containernet /bin/bash
 
 4) Скопируйте в docker-контейнер файл topo_for_lab.py
+- либо командой sudo docker cp <имя_файла> <имя_контейнера:/путь_к_директории>
+- либо вставить в текстовый редактор
 
 5) Откройте в браузере вкладки 
     - http://localhost:8181/onos/ui/#/topo2
     - http://localhost:8181/onos/v1/docs/#/
-логин: onosыudo docker 
+логин: onos
 пароль: rocks
 
 6) Войдите во вкладку Applications (слева вверху) и подключите библиотеки:
@@ -29,6 +31,7 @@ sudo docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock --privileg
     Они понадобятся для соединения docker с ONOS-контроллером
 
 7) После выполнения шага 6 вернитесь на вкладку Topology и посмотрите ваш ip_address
+- для этих же целей можно посмотреть вывод команды ifconfig
 
 8) Запустите в docker команду
 sudo python topo_for_lab.py 'ip_adress' 6633
