@@ -1,40 +1,65 @@
-1) Команды, необходимые для работы с докером:
-просмотр всех запущенных докеров: sudo docker ps -a
-остановить 4 последних докера: sudo docker stop $(sudo docker ps -a -q -n 4)
-убить 4 последних докера: sudo docker rm $(sudo docker ps -a -q -n 4)
+1) Установить Docker (https://docs.docker.com/engine/install/)
 
-2) Установить модуль KVM:
-- yеобходим для загрузки библиотеки для работы с коммутатором в докере
-sudo apt-get install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils 
+2) Выполнить
+sudo docker pull onosproject/onos
+sudo docker pull containernet/containernet
+
+3) Установить openvswitch при его отсутствии
 sudo apt-get install openvswitch-switch
 
-3) Откройте терминал и запустите следующие команды:
-sudo docker pull onosproject/onos
-sudo docker run -d -p 8181:8181 -p 6633:6633 -p 6653:6653 onosproject/onos
-sudo docker pull containernet/containernet
-sudo docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock --privileged --pid='host' containernet/containernet /bin/bash
+4) Полезные команды
+просмотр всех запущенных контейнеров: sudo docker ps -a
+остановить 4 последних контейнера: sudo docker stop $(sudo docker ps -a -q -n 4)
+удалить 4 последних контейнера: sudo docker rm $(sudo docker ps -a -q -n 4)
+удалить образ: sudo docker image rm <image_id>
 
-4) Скопируйте в docker-контейнер файл topo_for_lab.py
-- либо командой sudo docker cp <имя_файла> <имя_контейнера:/путь_к_директории>
-- либо вставить в текстовый редактор
+5) запустить onos и containernet
+sudo docker run --name onos -d -p 8181:8181 -p 6633:6633 -p 6653:6653 onosproject/onos 
+sudo docker run --name containernet --rm -it -v /var/run/docker.sock:/var/run/docker.sock --privileged --pid='host' containernet/containernet /bin/bash
 
-5) Откройте в браузере вкладки 
-    - http://localhost:8181/onos/ui/#/topo2
-    - http://localhost:8181/onos/v1/docs/#/
+Запустив containernet, оставьте его в интерактивном режиме, дальнейшую работу делайте в новом консольном окне
+
+web-интерфейс onos доступен по адресу
+    - http://localhost:8181/onos/ui/
 логин: onos
 пароль: rocks
 
-6) Войдите во вкладку Applications (слева вверху) и подключите библиотеки:
+6) В Web-интерфейсе войдите во вкладку Applications (слева вверху) и активируйте приложения (тругольник в правом верхнем углу):
     - org.onosproject.openflow-base
     - org.onosproject.lldpprovider
-    
-    Они понадобятся для соединения docker с ONOS-контроллером
 
-7) После выполнения шага 6 вернитесь на вкладку Topology и посмотрите ваш ip_address
-- для этих же целей можно посмотреть вывод команды ifconfig
+7) скрипт, создающий простую топологию из 2 коммутаторов и 2 хостов:
+https://github.com/vinevg1996/hse_spin_laboratory/blob/master/sdn_programs/topo_for_lab.py
 
-8) Запустите в docker команду
-sudo python3 topo_for_lab.py 'ip_adress' 6633
+7.1) Скрипт для топологии из 4 коммутаторов и 4 хостов:
+https://github.com/jorgelopezcoronado/SDNLab/blob/master/custom_ctnnet_topology.py
 
-9) Для конфигурации сети путём ''проталкивания''' правил перейдите на вкладку 
-http://localhost:8181/onos/v1/docs/#/
+8) Скопировать скрипт с созданием топологии в контейнер:
+sudo docker cp <имя_файла> <имя_контейнера:/путь_к_директории>
+sudo docker cp topo_for_lab.py containernet:containernet/
+
+При необходимости подключиться к контейнеру containernet (если вы запустили его в открепленном режиме)
+sudo docker exec -it containernet
+
+9) В web-интерфейсе на вкладке Topology указан ip_address
+Выполните в containernet:
+	sudo python3 topo_for_lab.py ip_address 6633
+	например
+	sudo python3 custom_ctnnet_topology.py 172.17.0.2 6633
+
+10) Убедитесь, что желаемая топология создана (Web-интерфейс, вкладка Topology)
+	Нажмите h чтобы увидеть хосты
+
+Убедитесь, что в топологии нет ни одного маршрута, выполнив команду pingall
+containernet> h1 ping h2
+containernet> h2 ping h1
+или
+containernet> pingall
+
+11) API onos доступен через localhost:8181/onos/v1/docs/, логин/пароль: onos/rocks
+В разделе "flows : Query and program flow rules" можно "проталкивать" правила в устройства через POST метод
+При проталкивании правила, указываем произвольный номер appId (выбираем один раз и каждый раз указываем его)
+
+
+Необходимо написать и применить ("протолкнуть") правила, которые позволят наладить маршрут между хостами h1 и h2
+Удалить все правила можно по appId методом delete в разделе "flows : Query and program flow rules"
