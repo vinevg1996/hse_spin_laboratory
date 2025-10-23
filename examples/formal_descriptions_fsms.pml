@@ -54,3 +54,4 @@ init {
 ltl f1 {[](s0_A -> ((!s1_A) until (r0_B)))}
 ltl f2 {[](s1_A -> ((!s0_A) until (r1_B)))}
 ltl f3 {[]<>(1)}
+ 
